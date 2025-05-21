@@ -1,26 +1,40 @@
 import { GoogleIcon } from "@/assets/vectors";
 import BackScreenButton from "@/components/common/BackScreenButotn";
+import DarkThemeBG from "@/components/common/DarkThemeBG";
 import InputForm from "@/components/common/InputForm";
 import MainButton from "@/components/common/MainButton";
 import ServiceButton from "@/components/common/ServiceButton";
+import themeStore from "@/stores/theme";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { router } from "expo-router";
+import React from "react";
+
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const LoginScreen = () => {
+  const theme = themeStore((state) => state.theme);
+  const mode = themeStore((state) => state.mode);
+
   const handleLogin = () => {
     router.replace("/(welcome)/welcome");
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.imageBackground}
-        source={require("@/assets/images/login/background.png")}
-      />
+      {mode === "light" ? (
+        <Image
+          style={styles.imageBackground}
+          source={require("@/assets/images/login/background.png")}
+        />
+      ) : (
+        <DarkThemeBG />
+      )}
+
       <BackScreenButton />
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>Welcome Back!</Text>
+        <Text style={[{ color: theme.colors.textAuthTitle }, styles.title]}>
+          Welcome Back!
+        </Text>
         <View style={styles.serviceContainer}>
           <ServiceButton
             icon={<Fontisto name="facebook" size={24} color="white" />}
@@ -45,7 +59,14 @@ const LoginScreen = () => {
           styleButton={{ marginTop: 30 }}
           actionHandle={handleLogin}
         />
-        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        <Text
+          style={[
+            { color: theme.colors.textForgot },
+            styles.forgotPasswordText,
+          ]}
+        >
+          Forgot Password?
+        </Text>
         <View style={styles.bottomContainer}>
           <Text style={styles.alreadyText}>ALREADY HAVE AN ACCOUNT? </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
@@ -71,7 +92,6 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Helvatica-Bold",
     fontSize: 28,
-    color: "#3F414E",
   },
   serviceContainer: {
     gap: 20,
@@ -97,7 +117,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "HelveticaNeue-Medium",
     fontSize: 14,
-    color: "#3F414E",
   },
   bottomContainer: {
     position: "absolute",

@@ -1,8 +1,10 @@
 import { GoogleIcon } from "@/assets/vectors";
 import BackScreenButton from "@/components/common/BackScreenButotn";
+import DarkThemeBG from "@/components/common/DarkThemeBG";
 import InputForm from "@/components/common/InputForm";
 import MainButton from "@/components/common/MainButton";
 import ServiceButton from "@/components/common/ServiceButton";
+import themeStore from "@/stores/theme";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Checkbox from "expo-checkbox";
 import { useState } from "react";
@@ -16,18 +18,26 @@ import {
 } from "react-native";
 
 const LoginScreen = () => {
+  const mode = themeStore((state) => state.mode);
+  const theme = themeStore((state) => state.theme);
   const [isChecked, setChecked] = useState(false);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Image
-          style={styles.imageBackground}
-          source={require("@/assets/images/login/background.png")}
-        />
+        {mode === "light" ? (
+          <Image
+            style={styles.imageBackground}
+            source={require("@/assets/images/login/background.png")}
+          />
+        ) : (
+          <DarkThemeBG />
+        )}
         <BackScreenButton />
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Create your account</Text>
+          <Text style={[{ color: theme.colors.textAuthTitle }, styles.title]}>
+            Create your account
+          </Text>
           <View style={styles.serviceContainer}>
             <ServiceButton
               icon={<Fontisto name="facebook" size={24} color="white" />}
@@ -81,7 +91,6 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Helvatica-Bold",
     fontSize: 28,
-    color: "#3F414E",
   },
   serviceContainer: {
     gap: 20,
