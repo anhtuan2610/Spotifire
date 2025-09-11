@@ -1,43 +1,48 @@
-import { Tabs } from "expo-router";
+import CustomBottomTab from "@/components/common/CustomBottomTab";
+import { MainTabsParamsList } from "@/types/navigation";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { Platform } from "react-native";
 
-import { HapticTab } from "@/components/HapticTab";
-import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const Tabs = createBottomTabNavigator<MainTabsParamsList>();
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  const inset = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
-          },
-          default: {},
-        }),
       }}
+      initialRouteName="home"
+      tabBar={(props) => <CustomBottomTab {...props} />}
+      safeAreaInsets={inset}
     >
       <Tabs.Screen
         name="home"
         options={{
           title: "Home",
-          tabBarIcon: () => (
-            <Ionicons name="home-outline" size={28} color="gray" />
-          ),
-          tabBarLabelStyle: {
-            fontSize: 14,
-            color: "gray",
-          },
+        }}
+      />
+
+      <Tabs.Screen
+        name="messenger"
+        options={{
+          title: "Chat",
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+        }}
+      />
+
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
         }}
       />
     </Tabs>

@@ -1,22 +1,65 @@
 import { GoogleIcon } from "@/assets/vectors";
 import BackScreenButton from "@/components/common/BackScreenButotn";
 import DarkThemeBG from "@/components/common/DarkThemeBG";
+import { FormErrorMessage } from "@/components/common/FormErrorMessage";
 import InputForm from "@/components/common/InputForm";
 import MainButton from "@/components/common/MainButton";
 import ServiceButton from "@/components/common/ServiceButton";
+import { ILoginRequest } from "@/entities/auth/model/api/dto/authDto";
+import { login } from "@/entities/auth/model/services/login";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
 import themeStore from "@/stores/theme";
 import Fontisto from "@expo/vector-icons/Fontisto";
+import { zodResolver } from "@hookform/resolvers/zod";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React from "react";
-
+import { Controller, useForm } from "react-hook-form";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  email: z.string().email("Email invalid, follow example@gmail.com"),
+  password: z.string().min(3, "Password must be at least 3 characters"),
+});
 
 const LoginScreen = () => {
   const theme = themeStore((state) => state.theme);
   const mode = themeStore((state) => state.mode);
+  const dispatch = useAppDispatch();
 
-  const handleLogin = () => {
-    router.replace("/(welcome)/welcome");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    resolver: zodResolver(loginSchema),
+  });
+
+  const handleLogin = async (body: ILoginRequest) => {
+    try {
+      const response = await dispatch(login(body)).unwrap();
+      if (response.data.accessToken && response.data.userInformation) {
+        AsyncStorage.setItem("accessToken", response.data.accessToken);
+        Toast.show({
+          type: "success",
+          text1: `Welcome back, ${response.data.userInformation.fullName}!`,
+        });
+        router.replace("/(welcome)/welcome");
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Login failed",
+        text2:
+          typeof error === "string" ? error : "Please check your credentials",
+      });
+    }
   };
 
   return (
@@ -51,13 +94,41 @@ const LoginScreen = () => {
         </View>
         <Text style={styles.orText}>OR LOG IN WITH EMAIL</Text>
         <View style={styles.inputFormContainer}>
-          <InputForm placeholder="Email address" />
-          <InputForm placeholder="Password" />
+          <Controller
+            name="email"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <InputForm
+                onChangeText={onChange}
+                value={value}
+                placeholder="Email address"
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <InputForm
+                onChangeText={onChange}
+                value={value}
+                placeholder="Password"
+                isSecurity={true}
+              />
+            )}
+          />
+          {errors.email ? (
+            <FormErrorMessage message={errors.email.message} />
+          ) : (
+            errors.password && (
+              <FormErrorMessage message={errors.password.message} />
+            )
+          )}
         </View>
         <MainButton
           text="LOG IN"
           styleButton={{ marginTop: 30 }}
-          actionHandle={handleLogin}
+          actionHandle={handleSubmit(handleLogin)}
         />
         <Text
           style={[

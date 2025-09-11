@@ -17,7 +17,7 @@ import {
   View,
 } from "react-native";
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const mode = themeStore((state) => state.mode);
   const theme = themeStore((state) => state.theme);
   const [isChecked, setChecked] = useState(false);
@@ -55,8 +55,8 @@ const LoginScreen = () => {
           <Text style={styles.orText}>OR LOG IN WITH EMAIL</Text>
           <View style={styles.inputFormContainer}>
             <InputForm placeholder="Email address" />
-            <InputForm placeholder="Password" secureTextEntry />
-            <InputForm placeholder="Confirm Password" secureTextEntry />
+            <InputForm placeholder="Password" />
+            <InputForm placeholder="Confirm Password" isSecurity={true} />
           </View>
           <View style={styles.privacyPolicyContainer}>
             <Text style={styles.privacyPolicyText1}>
@@ -159,4 +159,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
